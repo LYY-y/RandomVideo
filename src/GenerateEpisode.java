@@ -8,15 +8,39 @@
  * 3.记录已看过deleteEpisode
  * */
 
-/**随机生成集数*/
-public class GenerateEpisode {
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.TreeSet;
 
-    public int[] GenerateEpisode(int n){
-        int[] results = null;
-        int[][] episodes = EpisodeDAO.readEpisode("F:\\Personal\\Desktop\\RandomVideo\\Episode.txt",5);
-        int chapterTemp=this.craetRandom(0,episodes.length);
-        int episodeTemp=this.craetRandom(0,episodes[chapterTemp][episodes[chapterTemp].length-1]);
-        return results;
+public class GenerateEpisode {
+    /**随机生成集数*/
+    public List generateEpisode(String filePath, int chapter, int num){
+        List<TreeSet> allEpisodesList = EpisodeDAO.readEpisode(filePath,chapter);
+        int chaptersMax = allEpisodesList.size();
+        int episodeMin = 0;
+        int episodeMax = 0;
+        List<TreeSet> list=new ArrayList<TreeSet>(chaptersMax);
+        for (int i=0; i<chaptersMax; i++){
+            list.add(i,new TreeSet());
+        }
+        int count = 0;
+        while (count <= num ) {
+            int chapterTemp=this.craetRandom(0,chaptersMax);
+            if (allEpisodesList.get(chapterTemp).size() == 0){
+                continue;
+            }
+            episodeMin = (int) allEpisodesList.get(chapterTemp).first();
+            episodeMax = (int) allEpisodesList.get(chapterTemp).last();
+            int episodeTemp=this.craetRandom(episodeMin,episodeMax);
+            if (!list.get(chapterTemp).contains(episodeTemp)) {
+                list.get(chapterTemp).add(episodeTemp);
+                count++;
+            }else {
+                continue;
+            }
+        }
+        return list;
     }
 
     public int craetRandom(int begin, int last){
@@ -25,30 +49,33 @@ public class GenerateEpisode {
         return randoms;
     }
 
-
-    public void printRandom(int[] episodes){
-        for (int i=0; i<episodes.length; i=i+2) {
-            System.out.print("第" + episodes[i] + "季 第" + episodes[i+1] + "集");
+    public void printRandom(List<TreeSet> list){
+        for (int i=0; i<list.size(); i++) {
+            Iterator iterator = list.get(i).iterator();
+            while (iterator.hasNext()){
+                System.out.print("第" + (i+1) + "季 第" + (iterator.next()) + "集\n");
+            }
         }
     }
 
-    /**二分法查找数组是否存在目标数*/
-    public int isContains(int[] episodesLine, int target){
-        int left = 0;
-        int right = episodesLine.length-1;
-        while (left < right){
-            int mid = (left+right)>>>1;
-            if (episodesLine[mid] < target){
-                left=mid+1;
-            }else {
-                right=mid;
-            }
+
+
+    /**更新集数*/
+    public boolean updateEpisodes(String filePath, int chapter, int episode, String mode){
+        if ("del".equals(mode)) {
+            return EpisodeDAO.deleteEpisode(filePath, chapter, episode);
+        }else if ("add".equals(mode)){
+            return EpisodeDAO.addEpisode(filePath, chapter, episode);
         }
-        return left;
+        return false;
     }
 
     public static void main(String[] args){
-        int[] arr = {1,2,3,5,9,10,15};
-        System.out.println(new GenerateEpisode().isContains(arr,1));
+        String filePath = "F:\\Personal\\Desktop\\RandomVideo\\Episode.txt";
+        GenerateEpisode generateEpisode = new GenerateEpisode();
+        generateEpisode.updateEpisodes(filePath,4,1,"del");
+        generateEpisode.updateEpisodes(filePath, 5, 6, "add");
+        generateEpisode.printRandom(generateEpisode.generateEpisode(filePath,5,9));
+
     }
 }
