@@ -25,7 +25,7 @@ public class GenerateEpisode {
             list.add(i,new TreeSet());
         }
         int count = 0;
-        while (count <= num ) {
+        while (count < num ) {
             int chapterTemp=this.craetRandom(0,chaptersMax);
             if (allEpisodesList.get(chapterTemp).size() == 0){
                 continue;
@@ -75,7 +75,6 @@ public class GenerateEpisode {
         GenerateEpisode generateEpisode = new GenerateEpisode();
         generateEpisode.updateEpisodes(filePath,4,1,"del");
         generateEpisode.updateEpisodes(filePath, 5, 6, "add");
-        generateEpisode.printRandom(generateEpisode.generateEpisode(filePath,5,9));
-
+        generateEpisode.printRandom(generateEpisode.generateEpisode(filePath,1,5));
     }
 }
